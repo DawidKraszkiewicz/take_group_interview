@@ -1,0 +1,21 @@
+services:
+  nginx:
+    build:
+      context: ./docker/development/nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - php-fpm
+    networks:
+      - app-network
+
+  php-fpm:
+    build:
+      context: .
+      dockerfile: ./docker/common/php-fpm/Dockerfile
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

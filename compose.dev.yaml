@@ -1,0 +1,39 @@
+services:
+  nginx:
+    build:
+      context: ./docker/development/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/development/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php-fpm
+    networks:
+      - app-network
+
+  php-fpm:
+    build:
+      context: .
+      dockerfile: ./docker/common/php-fpm/Dockerfile
+    volumes:
+      - ./:/var/www/html
+      - ./docker/development/php-fpm/entrypoint.sh:/usr/local/bin/entrypoint.sh
+    entrypoint: ["/bin/sh", "/usr/local/bin/entrypoint.sh"]
+    networks:
+      - app-network
+
+  workspace:
+    build:
+      context: ./docker/development/workspace
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app-network
+    # Expose Vite dev server port
+    ports:
+      - "5173:5173"
+
+networks:
+  app-network:
+    driver: bridge
